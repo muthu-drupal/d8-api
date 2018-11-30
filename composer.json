@@ -1,0 +1,47 @@
+{
+    "name": "scmp-interview/api-d8",
+    "description": "Skeleton D8 project for API team assessment exercise.",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Sean Coleman",
+            "email": "sean.coleman@scmp.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.34",
+        "ext-pdo_sqlite": "*",
+        "composer/installers": "^1.2",
+        "drupal-composer/drupal-project": "8.x-dev",
+        "drupal/config_installer": "1.x-dev"
+    },
+    "scripts": {
+      "drupal-copy-settings": ["sudo cp -f config/settings.php web/sites/default/"],
+      "drupal-config-install": ["./vendor/bin/drush --root=web --account-pass=admin si config_installer"],
+      "drupal-config-import": ["./vendor/bin/drush --root=web config-import"],
+      "drupal-install": [
+        "DrupalComposer\\DrupalScaffold\\Plugin::scaffold",
+        "@drupal-copy-settings",
+        "@drupal-config-install",
+        "@drupal-config-import"
+      ]
+    },
+    "extra": {
+      "installer-paths": {
+        "web/core": ["type:drupal-core"],
+        "web/libraries/{$name}": ["type:drupal-library"],
+        "web/modules/contrib/{$name}": ["type:drupal-module"],
+        "web/profiles/contrib/{$name}": ["type:drupal-profile"],
+        "web/themes/contrib/{$name}": ["type:drupal-theme"],
+        "drush/contrib/{$name}": ["type:drupal-drush"]
+      }
+    }
+}

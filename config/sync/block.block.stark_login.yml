@@ -1,0 +1,22 @@
+uuid: 8c4bbb32-e86e-46aa-a6e6-ba5f58b63468
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+  theme:
+    - stark
+_core:
+  default_config_hash: 4QlSnWBcxxKMIFRM8sbu_MjSkcp3NjGgnVrc-lynQHI
+id: stark_login
+theme: stark
+region: sidebar_first
+weight: 0
+provider: null
+plugin: user_login_block
+settings:
+  id: user_login_block
+  label: 'User login'
+  provider: user
+  label_display: visible
+visibility: {  }

@@ -1,0 +1,14 @@
+uuid: dd14282e-5122-4933-b1de-ad3e6b7e83b2
+name: 'SCMP API Team Assessment'
+mail: admin@example.com
+slogan: ''
+page:
+  403: ''
+  404: ''
+  front: /user/login
+admin_compact_mode: false
+weight_select_max: 100
+langcode: en
+default_langcode: en
+_core:
+  default_config_hash: yXadRE77Va-G6dxhd2kPYapAvbnSvTF6hO4oXiOEynI
