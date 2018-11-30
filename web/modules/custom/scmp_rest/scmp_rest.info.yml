@@ -1,0 +1,9 @@
+name: Custom Rest API support
+description: 'Custom Rest API support to fetch articles.'
+type: module
+core: 8.x
+package: 'Custom'
+dependencies:
+  - drupal:rest
+  - drupal:basic_auth
+  - drupal:system (>=8.2.0)

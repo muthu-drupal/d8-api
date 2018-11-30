@@ -1,0 +1,39 @@
+scmp_rest.get_article:
+  path: '/api/article/{nid}'
+  defaults:
+    _controller: '\Drupal\scmp_rest\Controller\ScmpRestController::getArticle'
+  methods: [GET]
+  options:
+    _auth: [ 'basic_auth' ]
+  requirements:
+    _permission: 'access scmp rest endpoint'
+
+scmp_rest.get_articles_by_date:
+  path: '/api/articles-by-date/{published_date}'
+  defaults:
+    _controller: '\Drupal\scmp_rest\Controller\ScmpRestController::getArticlesByDate'
+  methods: [GET]
+  options:
+    _auth: [ 'basic_auth' ]
+  requirements:
+    _permission: 'access scmp rest endpoint'
+
+scmp_rest.get_articles_by_date_range:
+  path: '/api/articles-by-date-range/{start_date}/{end_date}'
+  defaults:
+    _controller: '\Drupal\scmp_rest\Controller\ScmpRestController::getArticlesByDateRange'
+  methods: [GET]
+  options:
+    _auth: [ 'basic_auth' ]
+  requirements:
+    _permission: 'access scmp rest endpoint'
+
+scmp_rest.get_articles_by_topic:
+  path: '/api/articles-by-topic/{topic}'
+  defaults:
+    _controller: '\Drupal\scmp_rest\Controller\ScmpRestController::getArticlesByTopic'
+  methods: [GET]
+  options:
+    _auth: [ 'basic_auth' ]
+  requirements:
+    _permission: 'access scmp rest endpoint'
