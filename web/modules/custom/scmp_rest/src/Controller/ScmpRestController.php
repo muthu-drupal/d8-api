@@ -13,7 +13,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  * Controller routines for REST resources.
  */
 class ScmpRestController extends ControllerBase {
-  
+
   /**
    * Entity query factory.
    *
@@ -24,8 +24,8 @@ class ScmpRestController extends ControllerBase {
   /**
    * Constructs a new CustomRestController object.
    *
-   * @param \Drupal\Core\Entity\Query\QueryFactory $entityQuery
-   * The entity query factory.
+   * @param \Drupal\Core\Entity\Query\QueryFactory $entity_query
+   *   The entity query factory.
    */
   public function __construct(QueryFactory $entity_query) {
     $this->entityQuery = $entity_query;
@@ -57,6 +57,7 @@ class ScmpRestController extends ControllerBase {
      ->condition('field_topic', $term_id[0])
      ->condition('status', 1)
      ->sort('changed', 'DESC')
+     ->range(0, 10)
      ->execute();
     if ($node_query) {
       $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
