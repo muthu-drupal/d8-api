@@ -1,3 +1,8 @@
 /vendor/
 /web/
 /data/db.sqlite
+# Include custom modules
+!web/modules/custom/*
+!web/modules/custom/*/*
+!web/modules/custom/*/*/*
+!web/modules/custom/*/*/*/*
