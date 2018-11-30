@@ -41,10 +41,10 @@ class ScmpRestController extends ControllerBase {
   }
 
   /**
-   * Return articles which is matched with given topic in a formatted JSON response.
+   * Return articles for given topic in a formatted JSON response.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
-   * The formatted JSON response.
+   *   The formatted JSON response.
    */
   public function getArticlesByTopic($topic) {
     // Initialize the response array.
@@ -53,12 +53,12 @@ class ScmpRestController extends ControllerBase {
     $topic_term = taxonomy_term_load_multiple_by_name($topic, $vocabulary);
     $term_id = array_keys($topic_term);
     $node_query = $this->entityQuery->get('node')
-     ->condition('type', 'article')
-     ->condition('field_topic', $term_id[0])
-     ->condition('status', 1)
-     ->sort('changed', 'DESC')
-     ->range(0, 10)
-     ->execute();
+      ->condition('type', 'article')
+      ->condition('field_topic', $term_id[0])
+      ->condition('status', 1)
+      ->sort('changed', 'DESC')
+      ->range(0, 10)
+      ->execute();
     if ($node_query) {
       $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
       foreach ($nodes as $node) {
@@ -76,10 +76,11 @@ class ScmpRestController extends ControllerBase {
   /**
    * Return article details for given node id.
    *
-   * @param integer $nid
+   * @param int $nid
    *   Node id.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
-   * The formatted JSON response.
+   *   The formatted JSON response.
    */
   public function getArticle($nid) {
     // Initialize the response array.
@@ -101,39 +102,39 @@ class ScmpRestController extends ControllerBase {
    * Return articles based on published date.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
-   * The formatted JSON response.
+   *   The formatted JSON response.
    */
-   public function getArticlesByDate($published_date) {
-     // Initialize the response array.
-     $response_array = [];
-     $date = new DrupalDateTime($published_date);
-     $timestamp = $date->getTimestamp();
-     $node_query = $this->entityQuery->get('node')
-       ->condition('field_publication_date', $timestamp, '>=')
-       ->condition('type', 'article')
-       ->condition('status', 1)
-       ->sort('changed', 'DESC')
-       ->execute();
-     if ($node_query) {
-       $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
-       foreach ($nodes as $node) {
-         $response_array[] = $this->getNodeData($node);
-       }
-     }
-     else {
-       // Set the default response to be returned if no results can be found.
-       $response_array = ['message' => 'Articles not found.'];
-     }
-     $response = $this->setCache($response_array, 'get_articles_by_date');
-     return $response;
-   }
+  public function getArticlesByDate($published_date) {
+    // Initialize the response array.
+    $response_array = [];
+    $date = new DrupalDateTime($published_date);
+    $timestamp = $date->getTimestamp();
+    $node_query = $this->entityQuery->get('node')
+      ->condition('field_publication_date', $timestamp, '>=')
+      ->condition('type', 'article')
+      ->condition('status', 1)
+      ->sort('changed', 'DESC')
+      ->execute();
+    if ($node_query) {
+      $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
+      foreach ($nodes as $node) {
+        $response_array[] = $this->getNodeData($node);
+      }
+    }
+    else {
+      // Set the default response to be returned if no results can be found.
+      $response_array = ['message' => 'Articles not found.'];
+    }
+    $response = $this->setCache($response_array, 'get_articles_by_date');
+    return $response;
+  }
 
   /**
-  * Return articles based on published date range.
-  *
-  * @return \Symfony\Component\HttpFoundation\JsonResponse
-  * The formatted JSON response.
-  */
+   * Return articles based on published date range.
+   *
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   *   The formatted JSON response.
+   */
   public function getArticlesByDateRange($start_date, $end_date) {
     // Initialize the response array.
     $response_array = [];
@@ -165,54 +166,58 @@ class ScmpRestController extends ControllerBase {
 
   /**
    * Helper function to fetch node data.
+   *
    * @param object $node
    *   Node id.
+   *
    * @return array
-   *   Node information. 
+   *   Node information.
    */
   private function getNodeData($node) {
-   $image_path = '';
-   $related_node_ids = [];
-   $topic_node_ids = [];
-   if (!empty($node->field_image->entity)) {
-     $file = $node->field_image->entity;
-     $image_path = file_create_url($file->getFileUri());
-   }
-   foreach ($node->field_related_article as $related_article) {
-     $related_node_ids[] = $related_article->target_id;
-   }
-   foreach ($node->field_topic as $topic) {
-     $topic_node_ids[] = $topic->target_id;
-   }
-   $publication_date = !empty($node->field_publication_date->value) ? date('d-m-Y H:i:s', $node->field_publication_date->value) : '';
-   return [
-     'nid' => (int)$node->nid->value,
-     'title' => $node->title->value,
-     'body' => $node->body->value,
-     'image_path' => $image_path,
-     'publication_date' => $publication_date,
-     'related_article_nid' => implode(",", $related_node_ids),
-     'topic_tid' => implode(",", $topic_node_ids),
-   ];
+    $image_path = '';
+    $related_node_ids = [];
+    $topic_node_ids = [];
+    if (!empty($node->field_image->entity)) {
+      $file = $node->field_image->entity;
+      $image_path = file_create_url($file->getFileUri());
+    }
+    foreach ($node->field_related_article as $related_article) {
+      $related_node_ids[] = $related_article->target_id;
+    }
+    foreach ($node->field_topic as $topic) {
+      $topic_node_ids[] = $topic->target_id;
+    }
+    $publication_date = !empty($node->field_publication_date->value) ? date('d-m-Y H:i:s', $node->field_publication_date->value) : '';
+    return [
+      'nid' => (int) $node->nid->value,
+      'title' => $node->title->value,
+      'body' => $node->body->value,
+      'image_path' => $image_path,
+      'publication_date' => $publication_date,
+      'related_article_nid' => implode(",", $related_node_ids),
+      'topic_tid' => implode(",", $topic_node_ids),
+    ];
   }
 
   /**
-  * Helper function to set cache and support JSON data.
-  * @param array $response_array
-  *   Response data.
-  * @param string $key
-  *   Unique key to set cache.
-  * @return array
-  *   Node information. 
-  */
-  private function setCache($response_array, $key) {
-   // Add the cache tag so the endpoint results will update when nodes are
-   // updated.
-   $cache_metadata = new CacheableMetadata();
-   $cache_metadata->setCacheTags([$key]);
-   // Create the JSON response object and add the cache metadata.
-   $response = new CacheableJsonResponse($response_array);
-   return $response->addCacheableDependency($cache_metadata);
+   * Helper function to set cache and support JSON data.
+   *
+   * @param array $response_array
+   *   Response data.
+   * @param string $key
+   *   Unique key to set cache.
+   *
+   * @return object
+   *   Node information.
+   */
+  private function setCache(array $response_array, $key) {
+    // Add the cache tag so the endpoint results will update when nodes are
+    // updated.
+    $cache_metadata = new CacheableMetadata();
+    $cache_metadata->setCacheTags([$key]);
+    // Create the JSON response object and add the cache metadata.
+    $response = new CacheableJsonResponse($response_array);
+    return $response->addCacheableDependency($cache_metadata);
   }
 
 }
