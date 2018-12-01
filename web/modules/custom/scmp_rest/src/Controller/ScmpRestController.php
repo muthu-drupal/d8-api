@@ -43,6 +43,9 @@ class ScmpRestController extends ControllerBase {
   /**
    * Return articles for given topic in a formatted JSON response.
    *
+   * @param string $topic
+   *   Term name.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The formatted JSON response.
    */
@@ -101,6 +104,9 @@ class ScmpRestController extends ControllerBase {
   /**
    * Return articles based on published date.
    *
+   * @param string $published_date
+   *   Publication date of the article.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The formatted JSON response.
    */
@@ -108,22 +114,29 @@ class ScmpRestController extends ControllerBase {
     // Initialize the response array.
     $response_array = [];
     $date = new DrupalDateTime($published_date);
-    $timestamp = $date->getTimestamp();
-    $node_query = $this->entityQuery->get('node')
-      ->condition('field_publication_date', $timestamp, '>=')
-      ->condition('type', 'article')
-      ->condition('status', 1)
-      ->sort('changed', 'DESC')
-      ->execute();
-    if ($node_query) {
-      $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
-      foreach ($nodes as $node) {
-        $response_array[] = $this->getNodeData($node);
+    if ($date instanceof DrupalDateTime && !$date->hasErrors()) {
+      $timestamp = $date->getTimestamp();
+      $end_timestamp = strtotime('+1 day', $timestamp);
+      $node_query = $this->entityQuery->get('node')
+        ->condition('field_publication_date', $timestamp, '>=')
+        ->condition('field_publication_date', $end_timestamp, '<=')
+        ->condition('type', 'article')
+        ->condition('status', 1)
+        ->sort('changed', 'DESC')
+        ->execute();
+      if ($node_query) {
+        $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
+        foreach ($nodes as $node) {
+          $response_array[] = $this->getNodeData($node);
+        }
+      }
+      else {
+        // Set the default response to be returned if no results can be found.
+        $response_array = ['message' => 'Articles not found.'];
       }
     }
     else {
-      // Set the default response to be returned if no results can be found.
-      $response_array = ['message' => 'Articles not found.'];
+      $response_array = ['message' => 'Invalid date.'];
     }
     $response = $this->setCache($response_array, 'get_articles_by_date');
     return $response;
@@ -132,6 +145,11 @@ class ScmpRestController extends ControllerBase {
   /**
    * Return articles based on published date range.
    *
+   * @param string $start_date
+   *   Publication date of the article.
+   * @param string $end_date
+   *   Publication date of the article.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   The formatted JSON response.
    */
@@ -139,26 +157,31 @@ class ScmpRestController extends ControllerBase {
     // Initialize the response array.
     $response_array = [];
     $start_date_obj = new DrupalDateTime($start_date);
-    $start_timestamp = $start_date_obj->getTimestamp();
     $end_date_obj = new DrupalDateTime($end_date);
-    $end_timestamp = $end_date_obj->getTimestamp();
-    $end_final_timestamp = strtotime('+1 day', $end_timestamp);
-    $node_query = $this->entityQuery->get('node')
-      ->condition('field_publication_date', $start_timestamp, '>=')
-      ->condition('field_publication_date', $end_final_timestamp, '<=')
-      ->condition('type', 'article')
-      ->condition('status', 1)
-      ->sort('changed', 'DESC')
-      ->execute();
-    if ($node_query) {
-      $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
-      foreach ($nodes as $node) {
-        $response_array[] = $this->getNodeData($node);
+    if (($start_date_obj instanceof DrupalDateTime && !$start_date_obj->hasErrors()) && ($end_date_obj instanceof DrupalDateTime && !$end_date_obj->hasErrors()) {
+      $start_timestamp = $start_date_obj->getTimestamp();
+      $end_timestamp = $end_date_obj->getTimestamp();
+      $end_final_timestamp = strtotime('+1 day', $end_timestamp);
+      $node_query = $this->entityQuery->get('node')
+        ->condition('field_publication_date', $start_timestamp, '>=')
+        ->condition('field_publication_date', $end_final_timestamp, '<=')
+        ->condition('type', 'article')
+        ->condition('status', 1)
+        ->sort('changed', 'DESC')
+        ->execute();
+      if ($node_query) {
+        $nodes = $this->entityTypeManager()->getStorage('node')->loadMultiple($node_query);
+        foreach ($nodes as $node) {
+          $response_array[] = $this->getNodeData($node);
+        }
+      }
+      else {
+        // Set the default response to be returned if no results can be found.
+        $response_array = ['message' => 'Articles not found.'];
       }
     }
     else {
-      // Set the default response to be returned if no results can be found.
-      $response_array = ['message' => 'Articles not found.'];
+      $response_array = ['message' => 'Invalid date.'];
     }
     $response = $this->setCache($response_array, 'get_articles_by_date');
     return $response;
